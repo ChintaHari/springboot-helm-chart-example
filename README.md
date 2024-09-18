@@ -127,3 +127,155 @@ $ helm install myapp ./myapp -f values-dev.yaml
 ```
 
 This command instructs Helm to override the default values defined in `values.yaml` with those specified in `values-dev.yaml`, ensuring the deployment is configured appropriately for the development environment. This approach not only streamlines the deployment process across different environments but also helps in maintaining the consistency and integrity of application deployments.
+
+## Spring Boot Application Setup
+
+This section describes the setup of a simple Spring Boot application that serves a list of customers through a REST endpoint.
+
+### Dependencies
+
+The Spring Boot application utilizes the following dependencies:
+
+- `spring-boot-starter-web` for building web, including RESTful, applications using Spring MVC. Uses Apache Tomcat as the default embedded container.
+- `spring-boot-devtools` for development-time features like automatic restarts.
+- `lombok` to minimize boilerplate code in Java applications.
+- `spring-boot-starter-test` for testing Spring Boot applications with libraries including JUnit, Hamcrest, and Mockito.
+
+### Dockerfile
+
+To containerize the Spring Boot application, we use the following Dockerfile:
+
+```dockerfile
+FROM openjdk:17
+WORKDIR /app
+COPY ./target/springboot-helm-chart-example.jar /app
+EXPOSE 8080
+CMD ["java", "-jar", "springboot-helm-chart-example.jar"]
+```
+
+This Dockerfile starts from the `openjdk:17` base image, sets the working directory to `/app`, copies the built jar file into the image, exposes port 8080, and specifies the command to run the application.
+
+## Deploying with Minikube and Helm
+
+### Setting Up the Environment
+
+#### Starting Minikube
+
+Minikube is a tool that lets you run Kubernetes locally. Start Minikube with the following command:
+
+```bash
+minikube start
+```
+
+This command starts a single-node Kubernetes cluster on your local machine.
+
+#### Starting Docker
+
+Ensure that Docker is running on your machine as Minikube will use Docker as the container runtime. You can start Docker through your desktop Docker application or by any other means you typically use.
+
+#### Syncing Docker Environment with Minikube
+To build images directly into Minikube's Docker environment (avoiding the need to push/pull from a registry), sync your Docker CLI to Minikube’s Docker daemon:
+
+```bash
+eval $(minikube docker-env)
+```
+
+Or, on PowerShell:
+
+```powershell
+minikube -p minikube docker-env --shell powershell | Invoke-Expression
+```
+
+This step is crucial as it allows you to use Docker directly on Minikube’s VM, which simplifies local development and testing.
+
+### Building the Application
+
+#### Compile and Package the Application
+Before building the Docker image, compile and package the Java application using Maven. This step creates the `jar` file that will be included in the Docker image.
+
+```bash
+mvn clean package
+```
+
+This command runs the Maven build process, which compiles the Java code and packages it into a `jar` file located in the `target/` directory.
+
+### Dockerizing the Application
+
+Navigate to the project directory where your Dockerfile is located and build the Docker image:
+
+```bash
+docker build -t springboot-helm-chart-app:2.0 .
+```
+
+This command builds a Docker image with the tag `springboot-helm-chart-app:2.0`, containing the Spring Boot application.
+
+### Deploying with Helm
+
+#### Initialize Helm Chart
+
+Create a Helm chart for the application which will define the Kubernetes resources needed to deploy:
+
+```bash
+helm create spring-app-chart
+```
+
+Navigate into the `spring-app-chart` directory and adjust the templates for deployment and services as necessary, ensuring values are correctly set for your application in `values.yaml`
+
+#### Deploy the Application
+
+Deploy your application to Kubernetes using the Helm chart:
+
+```bash
+helm install myapp-chart spring-app-chart
+```
+
+This command instructs Helm to manage the installation of your application, creating the necessary Kubernetes resources such as deployments and services.
+
+### Verifying the Deployment
+Check the status of the deployed resources:
+
+```bash
+kubectl get all
+```
+
+To view the logs from a specific pod:
+
+```bash
+kubectl logs myapp-chart-spring-app-chart-756f47df8f-527bt
+```
+
+### Accessing the Application
+Retrieve the service URL via Minikube to access your application:
+
+```bash
+minikube service myapp-chart-spring-app-chart --url
+```
+
+Visit the provided URL in your browser followed by `/customers` to interact with the deployed Spring Boot application.
+
+### Expected Outcome
+
+The application should return a JSON array of customers when the `/customers` endpoint is accessed, confirming that the deployment was successful and the application is functioning as expected within your Kubernetes cluster managed by Minikube.
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Hari Krishna",
+    "email": "harikrishna@gmail.com",
+    "gender": "male"
+  },
+  {
+    "id": 2,
+    "name": "Rakesh Kumar",
+    "email": "rakesh@gmail.com",
+    "gender": "male"
+  },
+  {
+    "id": 3,
+    "name": "Tarun Kumar",
+    "email": "tarun@gmail.com",
+    "gender": "male"
+  }
+]
+```
