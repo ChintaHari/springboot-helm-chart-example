@@ -68,6 +68,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>springboot-helm-chart-example</finalName>
 	</build>
 
 </project>
