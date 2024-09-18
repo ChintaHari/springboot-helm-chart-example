@@ -112,7 +112,7 @@ Rollback was a success! Happy Helming!
 
 ### Challenge 4: Environment-Specific Configurations
 
-![SolvingChallengeFourOfEnvSpecificConfigFiles](images/6.SolvingChallengeFourOfEnvSpecificConfigFiles.jpg)
+![SolvingChallengeFourOfEnvSpecificConfigFiles](images/6.SolvingChallengeFourOfEnvSpecificConfigFiles.png)
 
 Managing configurations for different environments (development, staging, production) can be complex without proper tools. Helm simplifies this process through the use of environment-specific values files:
 
