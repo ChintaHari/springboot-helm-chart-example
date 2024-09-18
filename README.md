@@ -218,6 +218,7 @@ Create a Helm chart for the application which will define the Kubernetes resourc
 ```bash
 helm create spring-app-chart
 ```
+![HelmChartCreated](images/8.HelmChartCreated.jpg)
 
 Navigate into the `spring-app-chart` directory and adjust the templates for deployment and services as necessary, ensuring values are correctly set for your application in `values.yaml`
 
@@ -228,6 +229,9 @@ Deploy your application to Kubernetes using the Helm chart:
 ```bash
 helm install myapp-chart spring-app-chart
 ```
+
+![HelmInstallingTheCreatedChart](images/9.HelmInstallingTheCreatedChart.jpg)
+
 
 This command instructs Helm to manage the installation of your application, creating the necessary Kubernetes resources such as deployments and services.
 
@@ -244,11 +248,21 @@ To view the logs from a specific pod:
 kubectl logs myapp-chart-spring-app-chart-756f47df8f-527bt
 ```
 
+![VerifyPodWorking](images/10.VerifyPodWorking.jpg)
+
+
 ### Accessing the Application
 Retrieve the service URL via Minikube to access your application:
 
 ```bash
 minikube service myapp-chart-spring-app-chart --url
+```
+
+you will get something like:
+
+```css
+http://127.0.0.1:50471
+❗  Because you are using a Docker driver on windows, the terminal needs to be open to run it.
 ```
 
 Visit the provided URL in your browser followed by `/customers` to interact with the deployed Spring Boot application.
@@ -279,3 +293,5 @@ The application should return a JSON array of customers when the `/customers` en
   }
 ]
 ```
+
+![EndpointHitSuccessfully](images/11.EndpointHitSuccessfully.jpg)
